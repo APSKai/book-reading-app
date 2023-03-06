@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<SplitPane fx:id="filterTable" dividerPositions="0.29797979797979796" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app1.FilterController">
+  <items>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="398.0" prefWidth="358.0">
+         <children>
+            <TextField fx:id="author" layoutX="14.0" layoutY="14.0" prefHeight="73.0" prefWidth="150.0" promptText="Author" />
+            <ComboBox fx:id="genres" layoutX="14.0" layoutY="192.0" prefHeight="34.0" prefWidth="150.0" promptText="Genres" />
+            <TextField fx:id="publisher" layoutX="14.0" layoutY="103.0" prefHeight="73.0" prefWidth="150.0" promptText="Publisher" />
+            <ComboBox fx:id="pageNum" layoutX="14.0" layoutY="242.0" prefHeight="34.0" prefWidth="150.0" promptText="Number of pages" />
+            <Button fx:id="close" layoutX="66.0" layoutY="351.0" mnemonicParsing="false" onMouseClicked="#closeFilter" prefHeight="25.0" prefWidth="45.0" text="Close" />
+            <Button fx:id="ok" layoutX="14.0" layoutY="303.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="66.0" text="OK" />
+            <Button fx:id="reset" layoutX="101.0" layoutY="303.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="66.0" text="Reset" />
+         </children></AnchorPane>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
+  </items>
+</SplitPane>
