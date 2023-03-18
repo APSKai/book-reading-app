@@ -2,6 +2,7 @@ package com.example.app1;
 
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
+import javafx.stage.FileChooser;
 import org.jpedal.PdfDecoder;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -77,7 +78,20 @@ public class Controller{
     @FXML
     void showPDF() {
         pdfViewer = new PDFViewer(canvas);
-        File pdfFile = new File("G:/04b.pdf");
+        FileChooser fileChooser = new FileChooser();
+
+        // Đặt tiêu đề cho hộp thoại chọn tệp
+        fileChooser.setTitle("Chọn tệp mới");
+
+        // Đặt thư mục mặc định để hiển thị
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+
+        // Thêm bộ lọc cho hộp thoại chọn tệp
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Tệp văn bản (*.pdf)", "*.pdf");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        // Hiển thị hộp thoại chọn tệp và lấy đối tượng tệp đã chọn
+        File pdfFile = fileChooser.showOpenDialog(null);
         try {
             pdfViewer.loadPDF(pdfFile);
         } catch (IOException | PdfException e) {
