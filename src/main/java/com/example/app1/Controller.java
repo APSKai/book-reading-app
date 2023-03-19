@@ -1,23 +1,23 @@
 package com.example.app1;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
-import javafx.scene.canvas.Canvas;
-import javafx.stage.FileChooser;
-import org.jpedal.PdfDecoder;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.jpedal.exception.PdfException;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.rendering.PDFRenderer;
+import org.apache.pdfbox.pdmodel.PDDocument;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Base64;
 import java.util.Objects;
 
 // Điều khiển các Button trong giao diện đầu tiên
@@ -28,8 +28,9 @@ public class Controller{
 
     @FXML
     private Canvas canvas;
-
-    private PDFViewer pdfViewer;
+    private PDDocument document;
+    private PDFRenderer renderer;
+    private int currentPage;
 
     @FXML
     private Button newButton;
@@ -54,13 +55,6 @@ public class Controller{
         newButton.setStyle("-fx-background-color: gray;");
     }
 
-    String imageToBase64(BufferedImage image) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(image, "png", baos);
-        byte[] bytes = baos.toByteArray();
-        return Base64.getEncoder().encodeToString(bytes);
-    }
-
     @FXML
     void openFilter(MouseEvent event) {
         try {
@@ -76,12 +70,11 @@ public class Controller{
     }
 
     @FXML
-    void showPDF() {
-        pdfViewer = new PDFViewer(canvas);
+    void renderPDF() {
         FileChooser fileChooser = new FileChooser();
 
         // Đặt tiêu đề cho hộp thoại chọn tệp
-        fileChooser.setTitle("Chọn tệp mới");
+        fileChooser.setTitle("Select book");
 
         // Đặt thư mục mặc định để hiển thị
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
@@ -89,15 +82,28 @@ public class Controller{
         // Thêm bộ lọc cho hộp thoại chọn tệp
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Tệp văn bản (*.pdf)", "*.pdf");
         fileChooser.getExtensionFilters().add(extFilter);
-
-        // Hiển thị hộp thoại chọn tệp và lấy đối tượng tệp đã chọn
         File pdfFile = fileChooser.showOpenDialog(null);
+
         try {
-            pdfViewer.loadPDF(pdfFile);
-        } catch (IOException | PdfException e) {
+            // Mở tệp PDF và tạo renderer để hiển thị nội dung
+            document = Loader.loadPDF(pdfFile);
+            renderer = new PDFRenderer(document);
+
+            // Hiển thị trang đầu tiên của tài liệu
+            currentPage = 0;
+            renderPage();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-
+    private void renderPage() throws IOException {
+        // Lấy context đồ họa của canvas
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        // Xóa nội dung cũ trên canvas
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        // Hiển thị trang PDF hiện tại
+        Image image = SwingFXUtils.toFXImage(renderer.renderImage(currentPage), null);
+        gc.drawImage(image, 0, 0, canvas.getWidth(), canvas.getHeight());
+    }
 }

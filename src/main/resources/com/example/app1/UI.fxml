@@ -14,7 +14,7 @@
    <top>
       <ToolBar prefHeight="63.0" prefWidth="800.0" BorderPane.alignment="CENTER">
         <items>
-          <Button fx:id="newButton" contentDisplay="TOP" mnemonicParsing="false" onMouseClicked="#showPDF" onMouseEntered="#changeColorEnterNew" onMouseExited="#returnColorNew" prefHeight="45.0" prefWidth="45.0" style="-fx-background-color: gray;" text="New">
+          <Button fx:id="newButton" contentDisplay="TOP" mnemonicParsing="false" onMouseClicked="#renderPDF" onMouseEntered="#changeColorEnterNew" onMouseExited="#returnColorNew" prefHeight="45.0" prefWidth="45.0" style="-fx-background-color: gray;" text="New">
                <graphic>
                   <ImageView fitHeight="27.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -58,6 +58,8 @@
                      </image>
                   </ImageView>
                </graphic></Button>
+            <Button mnemonicParsing="false" text="Button" />
+            <Button mnemonicParsing="false" text="Button" />
         </items>
       </ToolBar>
    </top>

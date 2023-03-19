@@ -7,7 +7,7 @@ module com.example.app1 {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
-    requires com.idrsolutions.jpedal;
+    requires org.apache.pdfbox;
 
     opens com.example.app1 to javafx.fxml;
     exports com.example.app1;
