@@ -13,9 +13,15 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.graphics.blend.BlendMode;
+import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
@@ -33,7 +39,16 @@ public class Controller{
     private int currentPage;
 
     @FXML
+    private Button nextButton;
+
+    @FXML
+    private Button prevButton;
+
+    @FXML
     private Button newButton;
+
+    private double pageX;
+    private double pageY;
 
     @FXML
     void changeColorEnterFilter(MouseEvent event) {
@@ -53,6 +68,27 @@ public class Controller{
     @FXML
     void returnColorNew(MouseEvent event) {
         newButton.setStyle("-fx-background-color: gray;");
+    }
+
+    @FXML
+    void changeColorEnterNext(MouseEvent event) {
+        if(!nextButton.isDisable()) nextButton.setStyle("-fx-background-color: silver;");
+    }
+
+    @FXML
+    void changeColorEnterPrev(MouseEvent event) {
+        if(!prevButton.isDisable()) prevButton.setStyle("-fx-background-color: silver;");
+    }
+
+    @FXML
+    void returnColorNext(MouseEvent event) {
+
+        if(!nextButton.isDisable()) nextButton.setStyle("-fx-background-color: gray;");
+    }
+
+    @FXML
+    void returnColorPrev(MouseEvent event) {
+        if(!prevButton.isDisable()) prevButton.setStyle("-fx-background-color: gray;");
     }
 
     @FXML
@@ -95,6 +131,7 @@ public class Controller{
         } catch (IOException e) {
             e.printStackTrace();
         }
+        nextButton.setDisable(false);
     }
 
     private void renderPage() throws IOException {
@@ -106,4 +143,60 @@ public class Controller{
         Image image = SwingFXUtils.toFXImage(renderer.renderImage(currentPage), null);
         gc.drawImage(image, 0, 0, canvas.getWidth(), canvas.getHeight());
     }
+    @FXML
+    private void prevButtonClicked() throws IOException {
+        if (document == null) return ;
+        if (currentPage > 0) {
+            // Hiển thị trang trước đó
+            nextButton.setDisable(false);
+            currentPage--;
+            if (currentPage == 0) prevButton.setDisable(true);
+            renderPage();
+        }
+    }
+    @FXML
+    private void nextButtonClicked() throws IOException {
+        if (document == null) return ;
+        if (currentPage < document.getNumberOfPages() - 1) {
+            // Hiển thị trang tiếp theo
+            prevButton.setDisable(false);
+            currentPage++;
+            if (currentPage == document.getNumberOfPages() - 1) nextButton.setDisable(true);
+            renderPage();
+        }
+    }
+
+    @FXML
+    void getEndPos(MouseEvent event) throws IOException {
+        if (document == null) return ;
+        double x = event.getX();
+        double y = event.getY();
+        PDPage page = document.getPage(currentPage);
+        // Tính toán tọa độ tương đối trên trang PDF
+        PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true);
+        PDExtendedGraphicsState gs = new PDExtendedGraphicsState();
+        gs.setBlendMode(BlendMode.MULTIPLY);
+        contentStream.setGraphicsStateParameters(gs);
+        System.out.println(pageX + " " + pageY+ " " + Math.abs(x-pageX) + " " + Math.abs(y-pageY));
+        PDRectangle rect = new PDRectangle((float) pageX, (float) pageY, (float) Math.abs(x-pageX), (float) Math.abs(y-pageY) );
+        contentStream.setNonStrokingColor(Color.CYAN); // Chọn màu xanh
+        contentStream.addRect(rect.getLowerLeftX(), rect.getLowerLeftY(), rect.getWidth(), rect.getHeight()); // Vẽ hình chữ nhật
+        contentStream.fill(); // Bôi đen hình chữ nhật
+        pageX = 0;
+        pageY = 0;
+        contentStream.close();
+        renderPage();
+    }
+
+    @FXML
+    void getStartPos(MouseEvent event) {
+        if (document == null) return ;
+        double x = event.getX();
+        double y = event.getY();
+        // Tính toán tọa độ tương đối trên trang PDF
+        pageX = x;
+        pageY = y;
+        System.out.println(pageX + " " + pageY);
+    }
+
 }

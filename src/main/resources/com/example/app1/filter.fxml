@@ -10,13 +10,13 @@
   <items>
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="398.0" prefWidth="358.0">
          <children>
-            <TextField fx:id="author" layoutX="14.0" layoutY="14.0" prefHeight="73.0" prefWidth="150.0" promptText="Author" />
-            <ComboBox fx:id="genres" layoutX="14.0" layoutY="192.0" prefHeight="34.0" prefWidth="150.0" promptText="Genres" />
-            <TextField fx:id="publisher" layoutX="14.0" layoutY="103.0" prefHeight="73.0" prefWidth="150.0" promptText="Publisher" />
-            <ComboBox fx:id="pageNum" layoutX="14.0" layoutY="242.0" prefHeight="34.0" prefWidth="150.0" promptText="Number of pages" />
+            <TextField fx:id="author" layoutX="13.0" layoutY="103.0" prefHeight="48.0" prefWidth="150.0" promptText="Author" />
+            <ComboBox fx:id="genres" layoutX="12.0" layoutY="244.0" prefHeight="34.0" prefWidth="150.0" promptText="Genres" />
+            <TextField fx:id="publisher" layoutX="12.0" layoutY="175.0" prefHeight="48.0" prefWidth="150.0" promptText="Publisher" />
             <Button fx:id="close" layoutX="66.0" layoutY="351.0" mnemonicParsing="false" onMouseClicked="#closeFilter" prefHeight="25.0" prefWidth="45.0" text="Close" />
             <Button fx:id="ok" layoutX="14.0" layoutY="303.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="66.0" text="OK" />
             <Button fx:id="reset" layoutX="101.0" layoutY="303.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="66.0" text="Reset" />
+            <TextField layoutX="13.0" layoutY="29.0" prefHeight="48.0" prefWidth="150.0" promptText="Title" />
          </children></AnchorPane>
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
   </items>
