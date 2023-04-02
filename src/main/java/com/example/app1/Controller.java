@@ -1,29 +1,36 @@
 package com.example.app1;
 
+import javafx.concurrent.Worker;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.embed.swing.SwingNode;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.graphics.blend.BlendMode;
-import org.apache.pdfbox.pdmodel.graphics.state.PDExtendedGraphicsState;
-import org.apache.pdfbox.rendering.PDFRenderer;
+import net.sourceforge.tess4j.*;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
+import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.tess4j.TesseractException;
 
-import java.awt.*;
+
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Objects;
 
 // Điều khiển các Button trong giao diện đầu tiên
@@ -33,22 +40,26 @@ public class Controller{
     private Button filterButton;
 
     @FXML
-    private Canvas canvas;
+    private WebView webView; // Đối tượng WebView để hiển thị trang PDF
+
+    private Tesseract tesseract;
+
     private PDDocument document;
     private PDFRenderer renderer;
     private int currentPage;
+    private boolean add;
 
     @FXML
     private Button nextButton;
+
+    @FXML
+    private ComboBox<String> comboBox;
 
     @FXML
     private Button prevButton;
 
     @FXML
     private Button newButton;
-
-    private double pageX;
-    private double pageY;
 
     @FXML
     void changeColorEnterFilter(MouseEvent event) {
@@ -106,7 +117,36 @@ public class Controller{
     }
 
     @FXML
-    void renderPDF() {
+    private void prevButtonClicked() throws IOException, TesseractException {
+        if (document == null) return ;
+        if (currentPage > 0) {
+            // Hiển thị trang trước đó
+            nextButton.setDisable(false);
+            currentPage--;
+            if (currentPage == 0) prevButton.setDisable(true);
+            showPage(currentPage);
+        }
+    }
+    @FXML
+    private void nextButtonClicked() throws IOException, TesseractException {
+        if (document == null) return ;
+        if (currentPage < document.getNumberOfPages() - 1) {
+            // Hiển thị trang tiếp theo
+            prevButton.setDisable(false);
+            currentPage++;
+            if (currentPage == document.getNumberOfPages() - 1) nextButton.setDisable(true);
+            showPage(currentPage);
+        }
+    }
+
+    @FXML
+    public void initPDF() throws IOException, TesseractException {
+        currentPage = 0;
+        document = null;
+        renderer=null;
+        prevButton.setDisable(true);
+        tesseract = new Tesseract();
+        tesseract.setDatapath("G:\\New folder\\app1\\src\\main\\resources\\tessdata");
         FileChooser fileChooser = new FileChooser();
 
         // Đặt tiêu đề cho hộp thoại chọn tệp
@@ -119,84 +159,63 @@ public class Controller{
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Tệp văn bản (*.pdf)", "*.pdf");
         fileChooser.getExtensionFilters().add(extFilter);
         File pdfFile = fileChooser.showOpenDialog(null);
+        // Đọc nội dung của file PDF
+        document = PDDocument.load(pdfFile);
+        renderer = new PDFRenderer(document);
+        nextButton.setDisable(false);
+        webView.setZoom(0.6);
+        comboBox.setValue("100%");
+        comboBox.setVisible(true);
+        showPage(currentPage);
+    }
 
+    void showPage(int currentPage) throws IOException, TesseractException {
+        BufferedImage bImage = renderer.renderImage(currentPage);
+        Image fxImage = SwingFXUtils.toFXImage(bImage, null);
+        webView.getEngine().loadContent("<html><body><img src='data:image/png;base64,"
+                + encodeToString(imageToBytes(fxImage))
+                + "'/></body></html>");
+        String res=tesseract.doOCR(bImage);
+        System.out.println(res);
+    }
+
+    private String encodeToString(byte[] image) {
+        return Base64.getEncoder().encodeToString(image);
+    }
+
+    private byte[] imageToBytes(Image image) {
+        BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
-            // Mở tệp PDF và tạo renderer để hiển thị nội dung
-            document = Loader.loadPDF(pdfFile);
-            renderer = new PDFRenderer(document);
-
-            // Hiển thị trang đầu tiên của tài liệu
-            currentPage = 0;
-            renderPage();
+            ImageIO.write(bImage, "png", outputStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        nextButton.setDisable(false);
+        return outputStream.toByteArray();
     }
 
-    private void renderPage() throws IOException {
-        // Lấy context đồ họa của canvas
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        // Xóa nội dung cũ trên canvas
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        // Hiển thị trang PDF hiện tại
-        Image image = SwingFXUtils.toFXImage(renderer.renderImage(currentPage), null);
-        gc.drawImage(image, 0, 0, canvas.getWidth(), canvas.getHeight());
-    }
     @FXML
-    private void prevButtonClicked() throws IOException {
-        if (document == null) return ;
-        if (currentPage > 0) {
-            // Hiển thị trang trước đó
-            nextButton.setDisable(false);
-            currentPage--;
-            if (currentPage == 0) prevButton.setDisable(true);
-            renderPage();
-        }
-    }
-    @FXML
-    private void nextButtonClicked() throws IOException {
-        if (document == null) return ;
-        if (currentPage < document.getNumberOfPages() - 1) {
-            // Hiển thị trang tiếp theo
-            prevButton.setDisable(false);
-            currentPage++;
-            if (currentPage == document.getNumberOfPages() - 1) nextButton.setDisable(true);
-            renderPage();
+    void handleComboBoxAction(Event event) {
+        if(!add) {
+            comboBox.getItems().add("50%");
+            comboBox.getItems().add("75%");
+            comboBox.getItems().add("100%");
+            comboBox.getItems().add("125%");
+            comboBox.getItems().add("150%");
+            comboBox.getItems().add("175%");
+            comboBox.getItems().add("200%");
+            add = true;
         }
     }
 
     @FXML
-    void getEndPos(MouseEvent event) throws IOException {
-        if (document == null) return ;
-        double x = event.getX();
-        double y = event.getY();
-        PDPage page = document.getPage(currentPage);
-        // Tính toán tọa độ tương đối trên trang PDF
-        PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true);
-        PDExtendedGraphicsState gs = new PDExtendedGraphicsState();
-        gs.setBlendMode(BlendMode.MULTIPLY);
-        contentStream.setGraphicsStateParameters(gs);
-        System.out.println(pageX + " " + pageY+ " " + Math.abs(x-pageX) + " " + Math.abs(y-pageY));
-        PDRectangle rect = new PDRectangle((float) pageX, (float) pageY, (float) Math.abs(x-pageX), (float) Math.abs(y-pageY) );
-        contentStream.setNonStrokingColor(Color.CYAN); // Chọn màu xanh
-        contentStream.addRect(rect.getLowerLeftX(), rect.getLowerLeftY(), rect.getWidth(), rect.getHeight()); // Vẽ hình chữ nhật
-        contentStream.fill(); // Bôi đen hình chữ nhật
-        pageX = 0;
-        pageY = 0;
-        contentStream.close();
-        renderPage();
+    void selectRatio(Event event) {
+        String selectedValue = comboBox.getValue();
+        String tmp = selectedValue.substring(0, selectedValue.length()-1);
+        double ratio = Double.parseDouble(tmp);
+        webView.setZoom(0.6*ratio/100);
     }
 
-    @FXML
-    void getStartPos(MouseEvent event) {
-        if (document == null) return ;
-        double x = event.getX();
-        double y = event.getY();
-        // Tính toán tọa độ tương đối trên trang PDF
-        pageX = x;
-        pageY = y;
-        System.out.println(pageX + " " + pageY);
-    }
+
 
 }

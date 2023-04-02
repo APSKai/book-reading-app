@@ -1,4 +1,4 @@
-module com.example.app1 {
+module com.example.app {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
@@ -7,7 +7,8 @@ module com.example.app1 {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
-    requires org.apache.pdfbox;
+    requires tess4j;
+    requires pdfbox;
 
     opens com.example.app1 to javafx.fxml;
     exports com.example.app1;
