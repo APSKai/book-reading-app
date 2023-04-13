@@ -64,6 +64,6 @@
       </VBox>
    </left>
    <center>
-      <WebView fx:id="webView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <WebView fx:id="webView" onMouseDragged="#dragPos" onMousePressed="#getPos" onMouseReleased="#finalPos" prefHeight="493.0" prefWidth="441.0" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

@@ -1,24 +1,21 @@
 package com.example.app1;
 
-import javafx.concurrent.Worker;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.embed.swing.SwingNode;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import net.sourceforge.tess4j.*;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
@@ -60,6 +57,12 @@ public class Controller{
 
     @FXML
     private Button newButton;
+
+    private javafx.scene.shape.Rectangle rectangle;
+
+    private java.awt.Rectangle rectangle2;
+
+    private BufferedImage currentImage;
 
     @FXML
     void changeColorEnterFilter(MouseEvent event) {
@@ -141,12 +144,18 @@ public class Controller{
 
     @FXML
     public void initPDF() throws IOException, TesseractException {
+        rectangle = new javafx.scene.shape.Rectangle(0,0,0,0);
+        rectangle.setFill(Color.TRANSPARENT);
+        rectangle.setStroke(Color.BLUE);
+        rectangle.setStrokeWidth(2);
+        rectangle2 = new java.awt.Rectangle(0,0,0,0);
         currentPage = 0;
         document = null;
         renderer=null;
         prevButton.setDisable(true);
         tesseract = new Tesseract();
         tesseract.setDatapath("G:\\New folder\\app1\\src\\main\\resources\\tessdata");
+        //tesseract.setLanguage("vie");
         FileChooser fileChooser = new FileChooser();
 
         // Đặt tiêu đề cho hộp thoại chọn tệp
@@ -162,6 +171,7 @@ public class Controller{
         // Đọc nội dung của file PDF
         document = PDDocument.load(pdfFile);
         renderer = new PDFRenderer(document);
+        PDPage page = document.getPage(1);
         nextButton.setDisable(false);
         webView.setZoom(0.6);
         comboBox.setValue("100%");
@@ -171,12 +181,11 @@ public class Controller{
 
     void showPage(int currentPage) throws IOException, TesseractException {
         BufferedImage bImage = renderer.renderImage(currentPage);
+        currentImage = bImage;
         Image fxImage = SwingFXUtils.toFXImage(bImage, null);
         webView.getEngine().loadContent("<html><body><img src='data:image/png;base64,"
                 + encodeToString(imageToBytes(fxImage))
                 + "'/></body></html>");
-        String res=tesseract.doOCR(bImage);
-        System.out.println(res);
     }
 
     private String encodeToString(byte[] image) {
@@ -216,6 +225,42 @@ public class Controller{
         webView.setZoom(0.6*ratio/100);
     }
 
+    @FXML
+    void getPos(MouseEvent event) {
+        rectangle.setX(event.getX());
+        rectangle.setY(event.getY());
+        rectangle2.setLocation((int) rectangle.getX(),(int) rectangle.getY());
+    }
+
+    @FXML
+    void dragPos(MouseEvent event) {
+        rectangle.setWidth(Math.abs(event.getX() - rectangle.getX()));
+        rectangle.setHeight(Math.abs(event.getY() - rectangle.getY()));
+        rectangle2.setSize((int) (rectangle.getWidth()), ((int) rectangle.getHeight()));
+        webView.getEngine().executeScript(
+                "var rect = document.getElementById('rect');" +
+                        "if (rect == null) {" +
+                        "   rect = document.createElement('div');" +
+                        "   rect.setAttribute('id', 'rect');" +
+                        "   document.body.appendChild(rect);" +
+                        "}" +
+                        "rect.style.position = 'absolute';" +
+                        "rect.style.left = '" + rectangle.getX() + "px';" +
+                        "rect.style.top = '" + rectangle.getY() + "px';" +
+                        "rect.style.width = '" + rectangle.getWidth() + "px';" +
+                        "rect.style.height = '" + rectangle.getHeight() + "px';" +
+                        "rect.style.border = '2px solid black';" +
+                        "rect.style.backgroundColor = 'rgba(173, 216, 230, 0.5)';"
+        );
+    }
+
+    @FXML
+    void finalPos(MouseEvent event) throws TesseractException {
+        System.out.println(tesseract.doOCR(currentImage,rectangle2));
+        //System.out.println(rectangle.getX()+" "+ rectangle.getY()+" "+rectangle.getHeight()+" "+rectangle.getWidth());
+        rectangle = new javafx.scene.shape.Rectangle(0,0,0,0);
+        rectangle2 = new java.awt.Rectangle(0,0,0,0);
+    }
 
 
 }
