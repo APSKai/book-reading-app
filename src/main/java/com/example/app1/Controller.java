@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -33,6 +34,10 @@ import java.util.Objects;
 // Điều khiển các Button trong giao diện đầu tiên
 public class Controller{
     public static Stage fstage ;
+    public static Stage tstage;
+
+    public static String chosenText;
+
     @FXML
     private Button filterButton;
 
@@ -54,6 +59,9 @@ public class Controller{
 
     @FXML
     private Button prevButton;
+
+    @FXML
+    private Button translateButton;
 
     @FXML
     private Button newButton;
@@ -114,6 +122,22 @@ public class Controller{
             fstage.setScene(new Scene(root));
             fstage.setTitle("Book Filter");
             fstage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void openTranslator(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("translator.fxml")));
+            Translator.isTrans = false;
+            translateButton.setVisible(false);
+            Parent root = loader.load();
+            tstage = new Stage();
+            tstage.setScene(new Scene(root));
+            tstage.setTitle("Translate text");
+            tstage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -256,10 +280,12 @@ public class Controller{
 
     @FXML
     void finalPos(MouseEvent event) throws TesseractException {
-        System.out.println(tesseract.doOCR(currentImage,rectangle2));
+        chosenText = tesseract.doOCR(currentImage,rectangle2);
+        System.out.println(chosenText);
         //System.out.println(rectangle.getX()+" "+ rectangle.getY()+" "+rectangle.getHeight()+" "+rectangle.getWidth());
         rectangle = new javafx.scene.shape.Rectangle(0,0,0,0);
         rectangle2 = new java.awt.Rectangle(0,0,0,0);
+        translateButton.setVisible(true);
     }
 
 

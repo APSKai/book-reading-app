@@ -49,6 +49,7 @@
                   </ImageView>
                </graphic></Button>
             <ComboBox fx:id="comboBox" editable="true" onAction="#selectRatio" onMouseEntered="#handleComboBoxAction" prefWidth="150.0" visible="false" />
+            <Button fx:id="translateButton" mnemonicParsing="false" onMouseClicked="#openTranslator" text="Translate" visible="false" />
         </items>
       </ToolBar>
    </top>
