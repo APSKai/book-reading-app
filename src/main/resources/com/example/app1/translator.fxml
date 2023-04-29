@@ -10,12 +10,12 @@
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
          <children>
             <Label layoutX="88.0" layoutY="14.0" prefHeight="27.0" prefWidth="100.0" text="     Selected text" />
-            <TextArea fx:id="selectedText" layoutX="48.0" layoutY="55.0" prefHeight="386.0" prefWidth="206.0" wrapText="true" />
+            <TextArea fx:id="selectedText" editable="false" layoutX="48.0" layoutY="55.0" prefHeight="386.0" prefWidth="206.0" wrapText="true" />
          </children></AnchorPane>
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
          <children>
             <Label layoutX="134.0" layoutY="20.0" text="Result" />
-            <TextArea fx:id="result" layoutX="48.0" layoutY="53.0" prefHeight="386.0" prefWidth="200.0" wrapText="true" />
+            <TextArea fx:id="result" editable="false" layoutX="48.0" layoutY="53.0" prefHeight="386.0" prefWidth="200.0" wrapText="true" />
          </children></AnchorPane>
   </items>
 </SplitPane>
