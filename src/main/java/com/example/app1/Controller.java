@@ -446,12 +446,22 @@ public class Controller implements Initializable {
     }
 
     @FXML
-    void getFile(MouseEvent event) throws IOException {
+    void getFile(MouseEvent event) {
         if(label.getText().equals("Recent Books")) {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 1) {
                 String selectedValue = list.getSelectionModel().getSelectedItem();
                 pdfFile = new File(selectedValue);
-                initPDF();
+                try {
+                    initPDF();
+                } catch (FileNotFoundException e) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setHeaderText("Sorry, we couldn't find your file");
+                    alert.setContentText("Please try again.");
+                    alert.showAndWait();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         else {
@@ -473,7 +483,11 @@ public class Controller implements Initializable {
                     nextButton.setDisable(false);
                     prevButton.setDisable(false);
                 }
-                showPage(currentPage);
+                try {
+                    showPage(currentPage);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
@@ -513,7 +527,6 @@ public class Controller implements Initializable {
             e.printStackTrace();
         }
         marked = scanner.nextInt();
-        System.out.println(marked);
         bm = new Vector<>();
         for (int i = 0; i < marked; i++) {
             int tmp = scanner.nextInt();
@@ -530,18 +543,38 @@ public class Controller implements Initializable {
 
     @FXML
     void newBookMark() {
-        if(isMarked[currentPage+1]) return;
-        try (FileWriter fileWriter = new FileWriter(logFile)) {
-            marked++;
-            isMarked[currentPage+1] = true;
-            fileWriter.write(Integer.toString(marked) + '\n');
-            for(int i = 0; i<a.size();i++) {
-                isMarked[a.get(i)] = true;
-                fileWriter.write(Integer.toString(a.get(i)) + '\n');
+        for (int i = 0; i < a.size(); i++) {
+            isMarked[a.get(i)] = true;
+        }
+        if(isMarked[currentPage+1]) {
+            try (FileWriter fileWriter = new FileWriter(logFile)) {
+                marked--;
+                isMarked[currentPage + 1] = false;
+                fileWriter.write(Integer.toString(marked) + '\n');
+                for (int i = 0; i < a.size(); i++) {
+                    if(a.get(i) == currentPage+1) {
+                        a.remove(i);
+                        i--;
+                    }
+                    else fileWriter.write(Integer.toString(a.get(i)) + '\n');
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-            fileWriter.write(Integer.toString(currentPage+1));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        }
+        else {
+            try (FileWriter fileWriter = new FileWriter(logFile)) {
+                marked++;
+                isMarked[currentPage + 1] = true;
+                fileWriter.write(Integer.toString(marked) + '\n');
+                for (int i = 0; i < a.size(); i++) {
+                    isMarked[a.get(i)] = true;
+                    fileWriter.write(Integer.toString(a.get(i)) + '\n');
+                }
+                fileWriter.write(Integer.toString(currentPage + 1));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         insBookmark();
     }

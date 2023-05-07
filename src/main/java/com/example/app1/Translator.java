@@ -24,9 +24,9 @@ public class Translator {
     private TextArea selectedText = new TextArea();
     public static boolean isTrans = false;
 
-    private final Pattern UNICODE_PATTERN = Pattern.compile("\\\\u([0-9A-Fa-f]{4})");
+    private static final Pattern UNICODE_PATTERN = Pattern.compile("\\\\u([0-9A-Fa-f]{4})");
 
-    private String normalizeUnicode(String input) {
+    public static String normalizeUnicode(String input) {
         Matcher matcher = UNICODE_PATTERN.matcher(input);
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {

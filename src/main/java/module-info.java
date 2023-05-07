@@ -9,6 +9,7 @@ module com.example.app {
     requires eu.hansolo.tilesfx;
     requires tess4j;
     requires pdfbox;
+    requires commons.csv;
 
     opens com.example.app1 to javafx.fxml;
     exports com.example.app1;
