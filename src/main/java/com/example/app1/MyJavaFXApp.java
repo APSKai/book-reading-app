@@ -2,8 +2,10 @@ package com.example.app1;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -19,6 +21,11 @@ public class MyJavaFXApp extends Application {
 
         // Đặt tiêu đề cho cửa sổ ứng dụng
         primaryStage.setTitle("JavaFX Book Reader");
+        primaryStage.setResizable(false);
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+
+        primaryStage.setWidth(screenBounds.getWidth());
+        primaryStage.setHeight(screenBounds.getHeight());
 
         // Đặt Scene làm nội dung cho cửa sổ ứng dụng
         primaryStage.setScene(scene);

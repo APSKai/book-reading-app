@@ -17,6 +17,7 @@ import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -153,6 +154,7 @@ public class Controller implements Initializable {
             FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("filter.fxml")));
             Parent root = loader.load();
             fstage = new Stage();
+            fstage.initStyle(StageStyle.UTILITY);
             fstage.setScene(new Scene(root));
             fstage.setTitle("Book Filter");
             fstage.show();
@@ -169,6 +171,7 @@ public class Controller implements Initializable {
             translateButton.setVisible(false);
             Parent root = loader.load();
             tstage = new Stage();
+            tstage.initStyle(StageStyle.UTILITY);
             tstage.setScene(new Scene(root));
             tstage.setTitle("Translate text");
             tstage.show();
