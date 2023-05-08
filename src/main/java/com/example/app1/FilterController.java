@@ -1,5 +1,9 @@
 package com.example.app1;
 
+import com.dropbox.core.DbxException;
+import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.FileMetadata;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
@@ -8,13 +12,16 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.fxml.FXML;
 
-import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
 public class FilterController implements Initializable {
+
     @FXML
     private TextField author;
 
@@ -41,6 +48,8 @@ public class FilterController implements Initializable {
     @FXML
     private Button close;
 
+    private Controller control;
+
 
     @FXML
     private ComboBox<String> genres;
@@ -61,6 +70,7 @@ public class FilterController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        control = Controller.con;
         Vector<String> it = new Vector<>();
         title.setText("");
         author.setText("");
@@ -70,7 +80,7 @@ public class FilterController implements Initializable {
         ObservableList<String> observableList = FXCollections.observableArrayList(it);
         genres.setItems(observableList);
         try {
-            loader = new CSVLoader("src\\main\\resources\\actor.csv");
+            loader = new CSVLoader("src\\main\\resources\\book2.csv");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -109,4 +119,55 @@ public class FilterController implements Initializable {
         table.getItems().setAll(loader.res);
     }
 
+    @FXML
+    void showInfo(MouseEvent event) {
+        if (event.getClickCount() == 1) {
+            ObservableList<TablePosition> posList = table.getSelectionModel().getSelectedCells();
+            int rowIndex = posList.get(0).getRow();
+            title.setText(String.valueOf(table.getColumns().get(0).getCellData(rowIndex)));
+            author.setText(String.valueOf(table.getColumns().get(1).getCellData(rowIndex)));
+            publisher.setText(String.valueOf(table.getColumns().get(2).getCellData(rowIndex)));
+            genres.setValue(String.valueOf(table.getColumns().get(3).getCellData(rowIndex)));
+        }
+        if (event.getClickCount() > 1) {
+            String val = title.getText();
+            String file_name = "";
+            for(int i = 0; i < loader.res.size(); i++) {
+                if(loader.res.get(i).getName().equals(val)) {
+                    file_name = loader.res.get(i).getFile_pdf();
+                    break;
+                }
+            }
+            getFileFromDropBox(file_name);
+        }
+    }
+
+    void getFileFromDropBox(String file_name) {
+
+        String path = "src\\main\\resources\\library\\" + file_name;
+        File newFile = new File(path);
+        if(newFile.exists()) {
+            Controller.pdfFile = newFile;
+            try {
+                control.initPDF();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            Controller.fstage.hide();
+            return;
+        }
+        // Download file
+        try {
+            DropBoxDownload.startDownload(file_name);
+        } catch (IOException | DbxException e) {
+            throw new RuntimeException(e);
+        }
+        Controller.pdfFile = newFile;
+        try {
+            control.initPDF();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Controller.fstage.hide();
+    }
 }

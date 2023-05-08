@@ -50,11 +50,11 @@ public class Book {
 
     private String file_pdf;
 
-    public Book(String name, String author, String publisher, String genres) {
+    public Book(String name, String author, String publisher, String genres, String file_pdf) {
         this.author = author;
         this.name = name;
         this.publisher = publisher;
         this.genres = genres;
-        //this.file_pdf = file_pdf;
+        this.file_pdf = file_pdf;
     }
 }

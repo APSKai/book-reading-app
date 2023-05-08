@@ -19,7 +19,7 @@ public class CSVLoader {
     public CSVLoader(String csvFilePath) throws IOException {
         FileReader reader = new FileReader(csvFilePath, StandardCharsets.UTF_8);
         try {
-            csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader());
+            csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withDelimiter(',').withHeader());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -32,8 +32,8 @@ public class CSVLoader {
             String author = record.get("author");
             String publisher = record.get("publisher");
             String genres = record.get("genres");
-            //String pdf_file = record.get("file_name");
-            Book tmp = new Book(name,author,publisher,genres);
+            String pdf_file = record.get("file_name");
+            Book tmp = new Book(name,author,publisher,genres, pdf_file);
             res.add(tmp);
         }
     }

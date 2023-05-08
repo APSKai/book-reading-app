@@ -48,6 +48,8 @@ public class Controller implements Initializable {
     @FXML
     private Button filterButton;
 
+    public static Controller con;
+
     @FXML
     private Button closeButton;
 
@@ -65,7 +67,7 @@ public class Controller implements Initializable {
     private int marked;
     private Vector <Integer> a;
 
-    private File pdfFile;
+    public static File pdfFile;
     private File logFile;
 
     @FXML
@@ -99,6 +101,7 @@ public class Controller implements Initializable {
     private Vector <String> name = new Vector<>();
 
     public void initialize(URL location, ResourceBundle resources) {
+        con = this;
         loadHistory();
         showHistory();
     }
@@ -232,7 +235,6 @@ public class Controller implements Initializable {
         tesseract.setDatapath("G:\\New folder\\app1\\src\\main\\resources\\tessdata");
         //tesseract.setLanguage("vie");
 
-        // Đọc nội dung của file PDF
         document = PDDocument.load(pdfFile);
         renderer = new PDFRenderer(document);
         PDPage page = document.getPage(1);

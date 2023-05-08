@@ -10,6 +10,7 @@ module com.example.app {
     requires tess4j;
     requires pdfbox;
     requires commons.csv;
+    requires dropbox.core.sdk;
 
     opens com.example.app1 to javafx.fxml;
     exports com.example.app1;

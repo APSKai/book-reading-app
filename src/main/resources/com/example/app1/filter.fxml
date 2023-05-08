@@ -22,7 +22,7 @@
          </children></AnchorPane>
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
          <children>
-            <TableView fx:id="table" layoutX="-1.0" prefHeight="398.0" prefWidth="418.0">
+            <TableView fx:id="table" layoutX="-1.0" onMouseClicked="#showInfo" prefHeight="398.0" prefWidth="418.0">
                <columns>
                   <TableColumn fx:id="titleCol" prefWidth="140.80004274845123" sortable="false" text="Title" />
                   <TableColumn fx:id="authorCol" prefWidth="107.199951171875" sortable="false" text="Author" />
