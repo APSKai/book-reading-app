@@ -24,8 +24,8 @@ public class MyJavaFXApp extends Application {
         primaryStage.setResizable(false);
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
 
-        primaryStage.setWidth(screenBounds.getWidth());
-        primaryStage.setHeight(screenBounds.getHeight());
+        //primaryStage.setWidth(screenBounds.getWidth());
+        //primaryStage.setHeight(screenBounds.getHeight());
 
         // Đặt Scene làm nội dung cho cửa sổ ứng dụng
         primaryStage.setScene(scene);

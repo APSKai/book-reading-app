@@ -75,20 +75,40 @@ public class FilterController implements Initializable {
         title.setText("");
         author.setText("");
         publisher.setText("");
-        it.add("Siu");
-        it.add("Chụy 7");
+        it.add("tài chính");
+        it.add("chính trị");
+        it.add("tiểu thuyết");
+        it.add("phát triển bản thân");
+        it.add("lịch sử");
+        it.add("công nghệ thông tin");
+        it.add("quân sự");
+        it.add("tâm lý");
+        it.add("truyện ngắn");
+        it.add("ngôn tình");
+        it.add("tác phẩm kinh điển");
+        it.add("khám phá-bí ẩn");
+        it.add("cổ tích-thần thoại");
+        it.add("huyền bí-giả tưởng");
+        it.add("phiêu lưu");
+        it.add("truyện cười");
+
+
         ObservableList<String> observableList = FXCollections.observableArrayList(it);
         genres.setItems(observableList);
         try {
-            loader = new CSVLoader("src\\main\\resources\\book2.csv");
+            loader = new CSVLoader("src\\main\\resources\\bookinfo.csv");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         loader.createList();
         titleCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        titleCol.setCellFactory(col -> new LongTextTableCell<>());
         authorCol.setCellValueFactory(new PropertyValueFactory<>("author"));
+        authorCol.setCellFactory(col -> new LongTextTableCell<>());
         publisherCol.setCellValueFactory(new PropertyValueFactory<>("publisher"));
+        publisherCol.setCellFactory(col -> new LongTextTableCell<>());
         genresCol.setCellValueFactory(new PropertyValueFactory<>("genres"));
+        genresCol.setCellFactory(col -> new LongTextTableCell<>());
         table.getItems().setAll(loader.res);
     }
 
@@ -121,16 +141,18 @@ public class FilterController implements Initializable {
 
     @FXML
     void showInfo(MouseEvent event) {
-        if (event.getClickCount() == 1) {
+       /* if (event.getClickCount() == 1) {
             ObservableList<TablePosition> posList = table.getSelectionModel().getSelectedCells();
             int rowIndex = posList.get(0).getRow();
             title.setText(String.valueOf(table.getColumns().get(0).getCellData(rowIndex)));
             author.setText(String.valueOf(table.getColumns().get(1).getCellData(rowIndex)));
             publisher.setText(String.valueOf(table.getColumns().get(2).getCellData(rowIndex)));
             genres.setValue(String.valueOf(table.getColumns().get(3).getCellData(rowIndex)));
-        }
+        } */
         if (event.getClickCount() > 1) {
-            String val = title.getText();
+            ObservableList<TablePosition> posList = table.getSelectionModel().getSelectedCells();
+            int rowIndex = posList.get(0).getRow();
+            String val = String.valueOf(table.getColumns().get(0).getCellData(rowIndex));
             String file_name = "";
             for(int i = 0; i < loader.res.size(); i++) {
                 if(loader.res.get(i).getName().equals(val)) {
@@ -143,7 +165,6 @@ public class FilterController implements Initializable {
     }
 
     void getFileFromDropBox(String file_name) {
-
         String path = "src\\main\\resources\\library\\" + file_name;
         File newFile = new File(path);
         if(newFile.exists()) {

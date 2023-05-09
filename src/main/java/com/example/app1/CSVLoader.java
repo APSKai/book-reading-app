@@ -70,7 +70,7 @@ public class CSVLoader {
 
     public Vector<Book> filterByGenres(String genres, Vector<Book> inp) {
         for(int i = 0; i<inp.size(); i++) {
-            if(!inp.get(i).getGenres().equals(genres)) {
+            if(!inp.get(i).getGenres().contains(genres)) {
                 inp.remove(i);
                 i--;
             }

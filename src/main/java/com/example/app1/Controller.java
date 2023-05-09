@@ -154,7 +154,7 @@ public class Controller implements Initializable {
             FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("filter.fxml")));
             Parent root = loader.load();
             fstage = new Stage();
-            fstage.initStyle(StageStyle.UTILITY);
+            fstage.setResizable(false);
             fstage.setScene(new Scene(root));
             fstage.setTitle("Book Filter");
             fstage.show();
@@ -171,7 +171,7 @@ public class Controller implements Initializable {
             translateButton.setVisible(false);
             Parent root = loader.load();
             tstage = new Stage();
-            tstage.initStyle(StageStyle.UTILITY);
+            tstage.setResizable(false);
             tstage.setScene(new Scene(root));
             tstage.setTitle("Translate text");
             tstage.show();
@@ -236,7 +236,7 @@ public class Controller implements Initializable {
         prevButton.setDisable(true);
         tesseract = new Tesseract();
         tesseract.setDatapath("G:\\New folder\\app1\\src\\main\\resources\\tessdata");
-        //tesseract.setLanguage("vie");
+        tesseract.setLanguage("vie");
 
         document = PDDocument.load(pdfFile);
         renderer = new PDFRenderer(document);
@@ -333,11 +333,11 @@ public class Controller implements Initializable {
     @FXML
     void finalPos(MouseEvent event) throws TesseractException {
         chosenText = tesseract.doOCR(currentImage,rectangle2);
-        System.out.println(chosenText);
+        //System.out.println(chosenText);
+        translateButton.setVisible(true);
         //System.out.println(rectangle.getX()+" "+ rectangle.getY()+" "+rectangle.getHeight()+" "+rectangle.getWidth());
         rectangle = new javafx.scene.shape.Rectangle(0,0,0,0);
         rectangle2 = new java.awt.Rectangle(0,0,0,0);
-        translateButton.setVisible(true);
     }
 
     void loadHistory() {
