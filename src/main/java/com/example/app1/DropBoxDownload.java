@@ -6,14 +6,21 @@ import com.dropbox.core.v2.files.FileMetadata;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Locale;
 
 public class DropBoxDownload {
@@ -24,37 +31,53 @@ public class DropBoxDownload {
     public static void startDownload(String file_name) throws IOException, DbxException {
         DbxRequestConfig config = new DbxRequestConfig("dropbox/read-app", Locale.getDefault().toString());
         DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
-
-        DbxAuthFinish authFinish;
+        final String[] code = {""};
         try {
             String accessToken = readAccessTokenFromFile();
             DbxClientV2 client = new DbxClientV2(config, accessToken);
             downloadFile(client, "/test/" + file_name, "src\\main\\resources\\library\\" + file_name);
-        } catch (IOException | InvalidAccessTokenException ex) {
+        } catch (IOException | InvalidAccessTokenException | IllegalArgumentException ex) {
             DbxWebAuth webAuth = new DbxWebAuth(config, appInfo);
             String authorizeUrl = webAuth.authorize(DbxWebAuth.Request.newBuilder().build());
-            System.out.println(authorizeUrl);
-            final String[] code = {""};
-            final boolean[] getCode = {false};
             Stage inputStage = new Stage();
             inputStage.setResizable(false);
-            TextArea message = new TextArea("Please go to: " + authorizeUrl + ".Click \"Allow\" (you might have to log in first)." +
-                    " Then Copy the authorization code.");
-            message.setWrapText(true);
-            message.setEditable(false);
+            Hyperlink hyperlink = new Hyperlink("here.");
+            TextFlow message = new TextFlow();
+            Text text1 = new Text("Please click " );
+            hyperlink.setOnMouseClicked(event -> {
+                if (Desktop.isDesktopSupported()) {
+                    try {
+                        Desktop.getDesktop().browse(new URI(authorizeUrl));
+                    } catch (IOException | URISyntaxException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            hyperlink.setUnderline(true);
+            hyperlink.setStyle("-fx-text-fill: blue;");
+            Text text2 = new Text("\nClick \"Allow\" (you might have to log in first). Then copy the authorization code.");
+            message.getChildren().addAll(text1, hyperlink, text2);
+            message.setPrefWidth(480);
+            message.setLineSpacing(5);
             TextField input = new TextField();
             input.setMinWidth(270.0);
             Button okButton = new Button("OK");
 
-            okButton.setOnAction(new EventHandler<ActionEvent>() {
+            okButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
-                public void handle(ActionEvent event) {
+                public void handle(MouseEvent event) {
                     code[0] = input.getText();
                     try {
-                        makeDownload(code[0], file_name);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    } catch (DbxException e) {
+                        makeDownload(code[0], file_name, 1);
+                    } catch (BadRequestException e) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Sorry, your access code was wrong or expired");
+                        alert.setContentText("Please try again.");
+                        File tmpFile = new File("src\\main\\resources\\library\\" + file_name);
+                        if (tmpFile.exists()) tmpFile.delete();
+                        alert.showAndWait();
+                    } catch (IOException | DbxException e) {
                         throw new RuntimeException(e);
                     }
                     inputStage.close();
@@ -67,6 +90,8 @@ public class DropBoxDownload {
     }
 
     public static void downloadFile(DbxClientV2 client, String dropboxFilePath, String localFilePath) throws IOException, DbxException {
+        System.out.println(dropboxFilePath);
+        System.out.println(localFilePath);
         FileOutputStream outputStream = new FileOutputStream(localFilePath);
         try {
             DbxDownloader<FileMetadata> downloader = client.files().download(dropboxFilePath);
@@ -104,7 +129,7 @@ public class DropBoxDownload {
         return refreshToken;
     }
 
-    public static void makeDownload(String code, String file_name) throws IOException, DbxException {
+    public static void makeDownload(String code, String file_name, int sta) throws IOException, DbxException {
         DbxRequestConfig config = new DbxRequestConfig("dropbox/read-app", Locale.getDefault().toString());
         DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
         DbxWebAuth webAuth = new DbxWebAuth(config, appInfo);

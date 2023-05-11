@@ -17,9 +17,7 @@ import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
@@ -165,6 +163,21 @@ public class Controller implements Initializable {
 
     @FXML
     void openTranslator(MouseEvent event) {
+        webView.getEngine().executeScript(
+                "var rect = document.getElementById('rect');" +
+                        "if (rect == null) {" +
+                        "   rect = document.createElement('div');" +
+                        "   rect.setAttribute('id', 'rect');" +
+                        "   document.body.appendChild(rect);" +
+                        "}" +
+                        "rect.style.position = 'absolute';" +
+                        "rect.style.left = '" + rectangle.getX() + "px';" +
+                        "rect.style.top = '" + rectangle.getY() + "px';" +
+                        "rect.style.width = '" + rectangle.getWidth() + "px';" +
+                        "rect.style.height = '" + rectangle.getHeight() + "px';" +
+                        "rect.style.border = '2px solid black';" +
+                        "rect.style.backgroundColor = 'rgba(173, 216, 230, 0.5)';"
+        );
         try {
             FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("translator.fxml")));
             Translator.isTrans = false;
@@ -209,13 +222,10 @@ public class Controller implements Initializable {
     public void chooseFile() throws IOException {
         FileChooser fileChooser = new FileChooser();
 
-        // Đặt tiêu đề cho hộp thoại chọn tệp
         fileChooser.setTitle("Select book");
 
-        // Đặt thư mục mặc định để hiển thị
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 
-        // Thêm bộ lọc cho hộp thoại chọn tệp
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Tệp văn bản (*.pdf)", "*.pdf");
         fileChooser.getExtensionFilters().add(extFilter);
         pdfFile = fileChooser.showOpenDialog(null);
@@ -235,12 +245,11 @@ public class Controller implements Initializable {
         renderer=null;
         prevButton.setDisable(true);
         tesseract = new Tesseract();
-        tesseract.setDatapath("G:\\New folder\\app1\\src\\main\\resources\\tessdata");
+        tesseract.setDatapath("src\\main\\resources\\tessdata");
         tesseract.setLanguage("vie");
 
         document = PDDocument.load(pdfFile);
         renderer = new PDFRenderer(document);
-        PDPage page = document.getPage(1);
         nextButton.setDisable(false);
         webView.setZoom(0.6);
         comboBox.setValue("100%");
@@ -248,6 +257,7 @@ public class Controller implements Initializable {
         closeButton.setVisible(true);
         pageNum.setVisible(true);
         maxPageNum.setVisible(true);
+        pageNum.setText("1");
         maxPageNum.setText("/"+Integer.toString(document.getNumberOfPages()));
         showPage(currentPage);
         updateHistory(pdfFile.toString());

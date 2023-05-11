@@ -1,9 +1,6 @@
 package com.example.app1;
 
 import com.dropbox.core.DbxException;
-import com.dropbox.core.DbxRequestConfig;
-import com.dropbox.core.v2.DbxClientV2;
-import com.dropbox.core.v2.files.FileMetadata;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
@@ -13,9 +10,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.fxml.FXML;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Vector;
@@ -141,14 +136,6 @@ public class FilterController implements Initializable {
 
     @FXML
     void showInfo(MouseEvent event) {
-       /* if (event.getClickCount() == 1) {
-            ObservableList<TablePosition> posList = table.getSelectionModel().getSelectedCells();
-            int rowIndex = posList.get(0).getRow();
-            title.setText(String.valueOf(table.getColumns().get(0).getCellData(rowIndex)));
-            author.setText(String.valueOf(table.getColumns().get(1).getCellData(rowIndex)));
-            publisher.setText(String.valueOf(table.getColumns().get(2).getCellData(rowIndex)));
-            genres.setValue(String.valueOf(table.getColumns().get(3).getCellData(rowIndex)));
-        } */
         if (event.getClickCount() > 1) {
             ObservableList<TablePosition> posList = table.getSelectionModel().getSelectedCells();
             int rowIndex = posList.get(0).getRow();
