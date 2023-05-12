@@ -16,7 +16,7 @@ public class CSVLoader {
     public Vector<Book> res;
 
     public CSVLoader(String csvFilePath) throws IOException {
-        FileReader reader = new FileReader(csvFilePath, StandardCharsets.UTF_8);
+        reader = new FileReader(csvFilePath, StandardCharsets.UTF_8);
         try {
             csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withDelimiter(',').withHeader());
         } catch (IOException e) {
@@ -24,7 +24,7 @@ public class CSVLoader {
         }
     }
 
-    public void createList() {
+    public void createList() throws IOException {
         res = new Vector<>();
         for (CSVRecord record : csvParser) {
             String name = record.get("book_name");
@@ -35,6 +35,8 @@ public class CSVLoader {
             Book tmp = new Book(name,author,publisher,genres, pdf_file);
             res.add(tmp);
         }
+        csvParser.close();
+        reader.close();
     }
 
     public Vector<Book> filterByName(String name, Vector<Book> inp) {

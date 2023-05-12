@@ -37,6 +37,7 @@ import java.util.*;
 public class Controller implements Initializable {
     public static Stage fstage ;
     public static Stage tstage;
+    private double currentRatio;
 
     public static String chosenText;
 
@@ -265,7 +266,7 @@ public class Controller implements Initializable {
         tesseract = new Tesseract();
         tesseract.setDatapath("src\\main\\resources\\tessdata");
         //tesseract.setLanguage("vie");
-
+        currentRatio = 100;
         document = PDDocument.load(pdfFile);
         renderer = new PDFRenderer(document);
         nextButton.setDisable(false);
@@ -330,21 +331,24 @@ public class Controller implements Initializable {
         String selectedValue = comboBox.getValue();
         String tmp = selectedValue.substring(0, selectedValue.length()-1);
         double ratio = Double.parseDouble(tmp);
+        currentRatio = ratio;
         webView.setZoom(ratio/100);
     }
 
     @FXML
     void getPos(MouseEvent event) {
-        rectangle.setX(event.getX());
-        rectangle.setY(event.getY());
-        rectangle2.setLocation((int) rectangle.getX(),(int) rectangle.getY());
+        if(currentRatio != 100 || event.getButton() != MouseButton.PRIMARY) return;
+        rectangle.setX(event.getX()*currentRatio/100);
+        rectangle.setY(event.getY()*currentRatio/100);
+        rectangle2.setLocation((int) ((int) rectangle.getX() * currentRatio / 100), (int) ((int) rectangle.getY() * currentRatio/100));
     }
 
     @FXML
     void dragPos(MouseEvent event) {
-        rectangle.setWidth(Math.abs(event.getX() - rectangle.getX()));
-        rectangle.setHeight(Math.abs(event.getY() - rectangle.getY()));
-        rectangle2.setSize((int) (rectangle.getWidth()), ((int) rectangle.getHeight()));
+        if(currentRatio != 100 || event.getButton() != MouseButton.PRIMARY) return;
+        rectangle.setWidth(Math.abs(event.getX() - rectangle.getX()) * currentRatio / 100);
+        rectangle.setHeight(Math.abs(event.getY() - rectangle.getY())* currentRatio / 100);
+        rectangle2.setSize((int) ((int) (rectangle.getWidth())* currentRatio / 100), (int) (((int) rectangle.getHeight())* currentRatio / 100));
         webView.getEngine().executeScript(
                 "var rect = document.getElementById('rect');" +
                         "if (rect == null) {" +
@@ -364,6 +368,7 @@ public class Controller implements Initializable {
 
     @FXML
     void finalPos(MouseEvent event) throws TesseractException {
+        if(currentRatio != 100 || event.getButton() != MouseButton.PRIMARY) return;
         chosenText = tesseract.doOCR(currentImage,rectangle2);
         //System.out.println(chosenText);
         translateButton.setVisible(true);
@@ -497,7 +502,7 @@ public class Controller implements Initializable {
                 } catch (FileNotFoundException e) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");
-                    alert.setHeaderText("Sorry, we couldn't find your file");
+                    alert.setHeaderText("Sorry, we couldn't find your file. It might have been moved, renamed, or deleted.");
                     alert.setContentText("Please try again.");
                     alert.showAndWait();
                 } catch (IOException e) {
@@ -525,8 +530,8 @@ public class Controller implements Initializable {
                     prevButton.setDisable(false);
                 }
                 try {
-                    showPage(currentPage);
                     changeMarked(currentPage);
+                    showPage(currentPage);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -573,6 +578,7 @@ public class Controller implements Initializable {
         for (int i = 0; i < marked; i++) {
             int tmp = scanner.nextInt();
             //System.out.println(tmp);
+            isMarked[tmp] = true;
             a.add(tmp);
         }
         Collections.sort(a);
@@ -651,7 +657,8 @@ public class Controller implements Initializable {
 
     @FXML
     void releaseRect(MouseEvent event) {
-        if(event.getButton() == MouseButton.SECONDARY) {
+        if(currentRatio != 100 || event.getButton() == MouseButton.PRIMARY) return;
+        if(event.getButton() == MouseButton.MIDDLE) {
             chosenText = "";
             translateButton.setVisible(false);
             rectangle = new javafx.scene.shape.Rectangle(0,0,0,0);

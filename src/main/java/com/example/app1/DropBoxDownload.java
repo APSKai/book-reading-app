@@ -3,14 +3,11 @@ package com.example.app1;
 import com.dropbox.core.*;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -28,14 +25,18 @@ public class DropBoxDownload {
     public static final String APP_SECRET = "r5dhqaknb40hy17";
     public static final String ACCESS_TOKEN_FILE_NAME = "access_token.txt";
     public static final String REFRESH_TOKEN_FILE_NAME = "refresh_token.txt";
-    public static void startDownload(String file_name) throws IOException, DbxException {
+
+    private static int downloadType;
+    public static void startDownload(String file_name, int type) throws IOException, DbxException {
         DbxRequestConfig config = new DbxRequestConfig("dropbox/read-app", Locale.getDefault().toString());
         DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
         final String[] code = {""};
+        downloadType = type;
         try {
             String accessToken = readAccessTokenFromFile();
             DbxClientV2 client = new DbxClientV2(config, accessToken);
-            downloadFile(client, "/test/" + file_name, "src\\main\\resources\\library\\" + file_name);
+            if(downloadType == 0) downloadFile(client, "/library/" + file_name, "src\\main\\resources\\library\\" + file_name);
+            else downloadFile(client, "/library/" + file_name, "src\\main\\resources\\" + file_name);
         } catch (IOException | InvalidAccessTokenException | IllegalArgumentException ex) {
             DbxWebAuth webAuth = new DbxWebAuth(config, appInfo);
             String authorizeUrl = webAuth.authorize(DbxWebAuth.Request.newBuilder().build());
@@ -55,7 +56,7 @@ public class DropBoxDownload {
             });
             hyperlink.setUnderline(true);
             hyperlink.setStyle("-fx-text-fill: blue;");
-            Text text2 = new Text("\nClick \"Allow\" (you might have to log in first). Then copy the authorization code.");
+            Text text2 = new Text("\nEmail: 21020075@vnu.edu.vn\nPassword: demosoftware\nClick \"Allow\" (you might have to log in first). Then copy the authorization code.");
             message.getChildren().addAll(text1, hyperlink, text2);
             message.setPrefWidth(480);
             message.setLineSpacing(5);
@@ -90,8 +91,8 @@ public class DropBoxDownload {
     }
 
     public static void downloadFile(DbxClientV2 client, String dropboxFilePath, String localFilePath) throws IOException, DbxException {
-        System.out.println(dropboxFilePath);
-        System.out.println(localFilePath);
+        //System.out.println(dropboxFilePath);
+        //System.out.println(localFilePath);
         FileOutputStream outputStream = new FileOutputStream(localFilePath);
         try {
             DbxDownloader<FileMetadata> downloader = client.files().download(dropboxFilePath);
@@ -137,6 +138,7 @@ public class DropBoxDownload {
         authFinish = webAuth.finishFromCode(code);
         writeAccessTokenToFile(authFinish.getAccessToken());
         DbxClientV2 client = new DbxClientV2(config, authFinish.getAccessToken());
-        downloadFile(client, "/test/" + file_name, "src\\main\\resources\\library\\" + file_name);
+        if(downloadType == 0) downloadFile(client, "/library/" + file_name, "src\\main\\resources\\library\\" + file_name);
+        else downloadFile(client, "/library/" + file_name, "src\\main\\resources\\" + file_name);
     }
 }

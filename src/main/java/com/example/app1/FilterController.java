@@ -30,6 +30,9 @@ public class FilterController implements Initializable {
     private TableColumn<Book, String> genresCol;
 
     @FXML
+    private Button updateButton;
+
+    @FXML
     private TableColumn<Book, String> publisherCol;
 
     @FXML
@@ -95,7 +98,11 @@ public class FilterController implements Initializable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        loader.createList();
+        try {
+            loader.createList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         titleCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         titleCol.setCellFactory(col -> new LongTextTableCell<>());
         authorCol.setCellValueFactory(new PropertyValueFactory<>("author"));
@@ -166,7 +173,7 @@ public class FilterController implements Initializable {
         }
         // Download file
         try {
-            DropBoxDownload.startDownload(file_name);
+            DropBoxDownload.startDownload(file_name,0);
         } catch (IOException | DbxException e) {
             throw new RuntimeException(e);
         }
@@ -177,5 +184,30 @@ public class FilterController implements Initializable {
             throw new RuntimeException(e);
         }
         Controller.fstage.hide();
+    }
+
+    @FXML
+    void updateLibrary(MouseEvent event) throws IOException, DbxException {
+        DropBoxDownload.startDownload("bookupdate.csv",1);
+        File tmp = new File("src\\main\\resources\\bookinfo.csv");
+        File tmp2 = new File("src\\main\\resources\\bookupdate.csv");
+        tmp.delete();
+        tmp2.renameTo(tmp);
+        try {
+            loader = new CSVLoader("src\\main\\resources\\bookinfo.csv");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        loader.createList();
+        titleCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        titleCol.setCellFactory(col -> new LongTextTableCell<>());
+        authorCol.setCellValueFactory(new PropertyValueFactory<>("author"));
+        authorCol.setCellFactory(col -> new LongTextTableCell<>());
+        publisherCol.setCellValueFactory(new PropertyValueFactory<>("publisher"));
+        publisherCol.setCellFactory(col -> new LongTextTableCell<>());
+        genresCol.setCellValueFactory(new PropertyValueFactory<>("genres"));
+        genresCol.setCellFactory(col -> new LongTextTableCell<>());
+        table.getItems().clear();
+        table.getItems().setAll(loader.res);
     }
 }
