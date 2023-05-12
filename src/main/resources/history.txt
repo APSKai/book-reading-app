@@ -1,11 +1,11 @@
 10
-src\main\resources\library\Jack - Cây Đậu Thần (Liesl Shurtliff) thuviensach.vn.pdf
-src\main\resources\library\chagiauchangheo.pdf
-src\main\resources\library\nhagiakim.pdf
-src\main\resources\library\Pháo Hiệu Đỏ (Georgy Beryozko) thuviensach.vn.pdf
+src\main\resources\library\Truyền Kỳ Mạn Lục (Nguyễn Dữ) thuviensach.vn.pdf
+C:\Users\phant\Downloads\02_SE intro2_DA_modified.pdf
+C:\Users\phant\Downloads\6.4.3.4 Packet Tracer - Troubleshooting Default Gateway Issues - ITExamAnswers.pdf
 C:\Users\phant\Downloads\12_Tong quan Testing.pdf
-src\main\resources\library\Biên Niên Sử Xứ Prydain_ Lâu Đài Llyr (Lloyd Alexander) thuviensach.vn.pdf
-src\main\resources\library\Kho Báu Của Hiệp Sĩ Đền Thờ (Steve Berry) thuviensach.vn.pdf
+src\main\resources\library\chagiauchangheo.pdf
+C:\Users\phant\Downloads\dactam.pdf
+src\main\resources\library\Jack - Cây Đậu Thần (Liesl Shurtliff) thuviensach.vn.pdf
+src\main\resources\library\nhagiakim.pdf
 src\main\resources\library\Đời Như Một Trò Đùa (Anh Em Nhà Javna) thuviensach.vn.pdf
-src\main\resources\library\Dữ Liệu Lớn (Viktor Mayer-Schonberger) thuviensach.vn.pdf
-src\main\resources\library\Kho Tàng Kinh Dị (Nguyễn Lê Quan) thuviensach.vn.pdf
+src\main\resources\library\Biên Niên Sử Xứ Prydain_ Lâu Đài Llyr (Lloyd Alexander) thuviensach.vn.pdf

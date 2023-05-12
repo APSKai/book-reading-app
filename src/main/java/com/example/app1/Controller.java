@@ -6,18 +6,23 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
@@ -41,6 +46,8 @@ public class Controller implements Initializable {
     @FXML
     private ListView<String> list;
 
+    public static String currentLang;
+
     @FXML
     private Text label;
 
@@ -58,6 +65,8 @@ public class Controller implements Initializable {
     private Tesseract tesseract;
 
     private int num;
+
+    private final Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
 
     private PDDocument document;
     private PDFRenderer renderer;
@@ -77,6 +86,9 @@ public class Controller implements Initializable {
 
     @FXML
     private TextField pageNum;
+
+    @FXML
+    private ComboBox<String> language;
 
     @FXML
     private Label maxPageNum;
@@ -100,6 +112,10 @@ public class Controller implements Initializable {
     private Vector <String> name = new Vector<>();
 
     public void initialize(URL location, ResourceBundle resources) {
+        Vector <String> lang = new Vector<>();
+        lang.add("eng");
+        lang.add("vie");
+        language.getItems().addAll(lang);
         con = this;
         loadHistory();
         showHistory();
@@ -202,6 +218,7 @@ public class Controller implements Initializable {
             currentPage--;
             if (currentPage == 0) prevButton.setDisable(true);
             showPage(currentPage);
+            changeMarked(currentPage);
             pageNum.setText(Integer.toString(currentPage+1));
         }
     }
@@ -214,6 +231,7 @@ public class Controller implements Initializable {
             currentPage++;
             if (currentPage == document.getNumberOfPages() - 1) nextButton.setDisable(true);
             showPage(currentPage);
+            changeMarked(currentPage);
             pageNum.setText(Integer.toString(currentPage+1));
         }
     }
@@ -246,12 +264,11 @@ public class Controller implements Initializable {
         prevButton.setDisable(true);
         tesseract = new Tesseract();
         tesseract.setDatapath("src\\main\\resources\\tessdata");
-        tesseract.setLanguage("vie");
+        //tesseract.setLanguage("vie");
 
         document = PDDocument.load(pdfFile);
         renderer = new PDFRenderer(document);
         nextButton.setDisable(false);
-        webView.setZoom(0.6);
         comboBox.setValue("100%");
         comboBox.setVisible(true);
         closeButton.setVisible(true);
@@ -260,8 +277,13 @@ public class Controller implements Initializable {
         pageNum.setText("1");
         maxPageNum.setText("/"+Integer.toString(document.getNumberOfPages()));
         showPage(currentPage);
+        changeMarked(currentPage);
         updateHistory(pdfFile.toString());
         label.setText("Bookmarks");
+        bookMark.setVisible(true);
+        language.setVisible(true);
+        language.setValue("eng");
+        currentLang = "eng";
         loadBookmark();
     }
 
@@ -308,7 +330,7 @@ public class Controller implements Initializable {
         String selectedValue = comboBox.getValue();
         String tmp = selectedValue.substring(0, selectedValue.length()-1);
         double ratio = Double.parseDouble(tmp);
-        webView.setZoom(0.6*ratio/100);
+        webView.setZoom(ratio/100);
     }
 
     @FXML
@@ -384,8 +406,11 @@ public class Controller implements Initializable {
         pageNum.setVisible(false);
         maxPageNum.setVisible(false);
         label.setText("Recent Books");
+        language.setVisible(false);
+        bookMark.setVisible(false);
         loadHistory();
         showHistory();
+        document.close();
     }
 
     void updateHistory(String path) {
@@ -458,6 +483,7 @@ public class Controller implements Initializable {
         }
         currentPage = tmp-1;
         showPage(currentPage);
+        changeMarked(currentPage);
     }
 
     @FXML
@@ -500,6 +526,7 @@ public class Controller implements Initializable {
                 }
                 try {
                     showPage(currentPage);
+                    changeMarked(currentPage);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -576,6 +603,7 @@ public class Controller implements Initializable {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            changeMarked(currentPage);
         }
         else {
             try (FileWriter fileWriter = new FileWriter(logFile)) {
@@ -590,8 +618,60 @@ public class Controller implements Initializable {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            changeMarked(currentPage);
         }
         insBookmark();
+    }
+
+    void changeMarked(int currentPage) {
+        if(isMarked[currentPage+1]) {
+            File file = new File("src\\main\\resources\\image\\star2.png");
+            Image image = new Image(file.toURI().toString());
+            ImageView imageView = new ImageView(image);
+            imageView.setFitHeight(27);
+            imageView.setFitWidth(27);
+            bookMark.setGraphic(imageView);
+        }
+        else {
+            File file = new File("src\\main\\resources\\image\\star.png");
+            Image image = new Image(file.toURI().toString());
+            ImageView imageView = new ImageView(image);
+            imageView.setFitHeight(27);
+            imageView.setFitWidth(27);
+            bookMark.setGraphic(imageView);
+        }
+    }
+
+    @FXML
+    void setLang(ActionEvent event) {
+        String tmp = language.getValue();
+        currentLang = language.getValue();
+        tesseract.setLanguage(tmp);
+    }
+
+    @FXML
+    void releaseRect(MouseEvent event) {
+        if(event.getButton() == MouseButton.SECONDARY) {
+            chosenText = "";
+            translateButton.setVisible(false);
+            rectangle = new javafx.scene.shape.Rectangle(0,0,0,0);
+            rectangle2 = new java.awt.Rectangle(0,0,0,0);
+            webView.getEngine().executeScript(
+                    "var rect = document.getElementById('rect');" +
+                            "if (rect == null) {" +
+                            "   rect = document.createElement('div');" +
+                            "   rect.setAttribute('id', 'rect');" +
+                            "   document.body.appendChild(rect);" +
+                            "}" +
+                            "rect.style.position = 'absolute';" +
+                            "rect.style.left = '" + rectangle.getX() + "px';" +
+                            "rect.style.top = '" + rectangle.getY() + "px';" +
+                            "rect.style.width = '" + rectangle.getWidth() + "px';" +
+                            "rect.style.height = '" + rectangle.getHeight() + "px';" +
+                            "rect.style.border = '2px solid black';" +
+                            "rect.style.backgroundColor = 'rgba(173, 216, 230, 0.5)';"
+            );
+        }
     }
 
 }

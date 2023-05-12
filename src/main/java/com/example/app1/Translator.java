@@ -49,7 +49,6 @@ public class Translator implements Initializable {
                 res.append(input.charAt(i));
             }
         }
-        System.out.println(res);
         return String.valueOf(res);
     }
 
@@ -62,8 +61,17 @@ public class Translator implements Initializable {
         selectedText.setText(textToTranslate);
 
         // Source and target languages
-        String sourceLang = "vi";
-        String targetLang = "en";
+        String sourceLang = "";
+        String targetLang = "";
+
+        if (Controller.currentLang.equals("eng")) {
+            sourceLang = "en";
+            targetLang = "vi";
+        }
+        else {
+            sourceLang = "vi";
+            targetLang = "en";
+        }
 
         // URL for MyMemory API
         String urlStr = "https://api.mymemory.translated.net/get?q=" + URLEncoder.encode(textToTranslate, StandardCharsets.UTF_8) + "&langpair=" + sourceLang + "|" + targetLang + "&key=" + apiKey;
@@ -114,7 +122,11 @@ public class Translator implements Initializable {
         String translation = response.toString().split("\"translatedText\":\"")[1].split("\"")[0];
         // Print translation
         String res1 = normalizeUnicode(translation);
-        result.setText(normalizeSpace(res1));
+        String ans = normalizeSpace(res1);
+        if(ans.equals("QUERY LENGTH LIMIT EXCEEDED. MAX ALLOWED QUERY : 500 CHARS")) {
+            result.setText("Sorry, I can translate up to a maximum of 500 characters per request");
+        }
+        else result.setText(ans);
         isTrans = true;
     }
 }
