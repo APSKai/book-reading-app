@@ -65,6 +65,8 @@ public class Controller implements Initializable {
 
     private Tesseract tesseract;
 
+    private Vector<String> title = new Vector<>();
+
     private int num;
 
     private final Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
@@ -379,6 +381,7 @@ public class Controller implements Initializable {
 
     void loadHistory() {
         name.clear();
+        title.clear();
         list.getItems().clear();
         File url = new File("src\\main\\resources\\history.txt");
         Scanner scanner = null;
@@ -392,12 +395,18 @@ public class Controller implements Initializable {
         for (int i = 0; i < num; i++) {
             String tmp = scanner.nextLine();
             name.add(tmp);
+            for(int j = tmp.length()-1; j >= 0; j--) {
+                if(tmp.charAt(j) == '\\') {
+                    title.add(tmp.substring(j+1,tmp.length()));
+                    break;
+                }
+            }
         }
         scanner.close();
     }
 
     void showHistory() {
-        list.getItems().addAll(name);
+        list.getItems().addAll(title);
     }
 
     @FXML
@@ -496,7 +505,12 @@ public class Controller implements Initializable {
         if(label.getText().equals("Recent Books")) {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 1) {
                 String selectedValue = list.getSelectionModel().getSelectedItem();
-                pdfFile = new File(selectedValue);
+                for(int i=0;i<name.size();i++) {
+                    if(name.get(i).contains(selectedValue)) {
+                        pdfFile = new File(name.get(i));
+                        break;
+                    }
+                }
                 try {
                     initPDF();
                 } catch (FileNotFoundException e) {
