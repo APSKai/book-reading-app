@@ -14,6 +14,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
@@ -21,8 +24,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
@@ -33,7 +34,6 @@ import java.io.*;
 import java.net.URL;
 import java.util.*;
 
-// Điều khiển các Button trong giao diện đầu tiên
 public class Controller implements Initializable {
     public static Stage fstage ;
     public static Stage tstage;
@@ -61,7 +61,7 @@ public class Controller implements Initializable {
     private Button closeButton;
 
     @FXML
-    private WebView webView; // Đối tượng WebView để hiển thị trang PDF
+    private WebView webView;
 
     private Tesseract tesseract;
 
@@ -86,6 +86,9 @@ public class Controller implements Initializable {
 
     @FXML
     private Button bookMark;
+
+    @FXML
+    private BorderPane borderPane;
 
     @FXML
     private TextField pageNum;
@@ -115,11 +118,41 @@ public class Controller implements Initializable {
     private Vector <String> name = new Vector<>();
 
     public void initialize(URL location, ResourceBundle resources) {
+        try {
+            loadDefaultScene();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         Vector <String> lang = new Vector<>();
         lang.add("eng");
         lang.add("vie");
         language.getItems().addAll(lang);
         con = this;
+        File file = new File("src\\main\\resources\\image\\listview.png");
+        BufferedImage listImage = null;
+        try {
+            listImage = ImageIO.read(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        list.setCellFactory(lv -> new ListCell<String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("-fx-background-color: transparent;");
+                } else {
+                    setText(item);
+                    setStyle("-fx-background-color: transparent;");
+                }
+                setTextFill(Color.YELLOW);
+            }
+        });
+        Image image = SwingFXUtils.toFXImage(listImage, null);
+        BackgroundImage backgroundImage = new BackgroundImage(image,
+                null, null, null, null);
+        list.setBackground(new Background(backgroundImage));
         loadHistory();
         showHistory();
     }
@@ -339,7 +372,7 @@ public class Controller implements Initializable {
 
     @FXML
     void getPos(MouseEvent event) {
-        if(currentRatio != 100 || event.getButton() != MouseButton.PRIMARY) return;
+        if(currentRatio != 100 || event.getButton() != MouseButton.PRIMARY || !closeButton.isVisible()) return;
         rectangle.setX(event.getX()*currentRatio/100);
         rectangle.setY(event.getY()*currentRatio/100);
         rectangle2.setLocation((int) ((int) rectangle.getX() * currentRatio / 100), (int) ((int) rectangle.getY() * currentRatio/100));
@@ -347,7 +380,7 @@ public class Controller implements Initializable {
 
     @FXML
     void dragPos(MouseEvent event) {
-        if(currentRatio != 100 || event.getButton() != MouseButton.PRIMARY) return;
+        if(currentRatio != 100 || event.getButton() != MouseButton.PRIMARY || !closeButton.isVisible()) return;
         rectangle.setWidth(Math.abs(event.getX() - rectangle.getX()) * currentRatio / 100);
         rectangle.setHeight(Math.abs(event.getY() - rectangle.getY())* currentRatio / 100);
         rectangle2.setSize((int) ((int) (rectangle.getWidth())* currentRatio / 100), (int) (((int) rectangle.getHeight())* currentRatio / 100));
@@ -370,7 +403,7 @@ public class Controller implements Initializable {
 
     @FXML
     void finalPos(MouseEvent event) throws TesseractException {
-        if(currentRatio != 100 || event.getButton() != MouseButton.PRIMARY) return;
+        if(currentRatio != 100 || event.getButton() != MouseButton.PRIMARY || !closeButton.isVisible()) return;
         chosenText = tesseract.doOCR(currentImage,rectangle2);
         //System.out.println(chosenText);
         translateButton.setVisible(true);
@@ -425,6 +458,7 @@ public class Controller implements Initializable {
         loadHistory();
         showHistory();
         document.close();
+        loadDefaultScene();
     }
 
     void updateHistory(String path) {
@@ -645,7 +679,7 @@ public class Controller implements Initializable {
 
     void changeMarked(int currentPage) {
         if(isMarked[currentPage+1]) {
-            File file = new File("src\\main\\resources\\image\\star2.png");
+            File file = new File("src\\main\\resources\\image\\mark2.png");
             Image image = new Image(file.toURI().toString());
             ImageView imageView = new ImageView(image);
             imageView.setFitHeight(27);
@@ -653,7 +687,7 @@ public class Controller implements Initializable {
             bookMark.setGraphic(imageView);
         }
         else {
-            File file = new File("src\\main\\resources\\image\\star.png");
+            File file = new File("src\\main\\resources\\image\\mark.png");
             Image image = new Image(file.toURI().toString());
             ImageView imageView = new ImageView(image);
             imageView.setFitHeight(27);
@@ -671,7 +705,7 @@ public class Controller implements Initializable {
 
     @FXML
     void releaseRect(MouseEvent event) {
-        if(currentRatio != 100 || event.getButton() == MouseButton.PRIMARY) return;
+        if(currentRatio != 100 || event.getButton() == MouseButton.PRIMARY || !closeButton.isVisible()) return;
         if(event.getButton() == MouseButton.MIDDLE) {
             chosenText = "";
             translateButton.setVisible(false);
@@ -693,6 +727,15 @@ public class Controller implements Initializable {
                             "rect.style.backgroundColor = 'rgba(173, 216, 230, 0.5)';"
             );
         }
+    }
+
+    void loadDefaultScene() throws IOException {
+        File imageFile = new File("src\\main\\resources\\image\\webview.png");
+        BufferedImage bImage = ImageIO.read(imageFile);
+        Image fxImage = SwingFXUtils.toFXImage(bImage, null);
+        webView.getEngine().loadContent("<html><body><img src='data:image/png;base64,"
+                + encodeToString(imageToBytes(fxImage))
+                + "'/></body></html>");
     }
 
 }

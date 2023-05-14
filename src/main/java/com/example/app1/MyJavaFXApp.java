@@ -22,10 +22,6 @@ public class MyJavaFXApp extends Application {
         // Đặt tiêu đề cho cửa sổ ứng dụng
         primaryStage.setTitle("JavaFX Book Reader");
         primaryStage.setResizable(false);
-        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-
-        //primaryStage.setWidth(screenBounds.getWidth());
-        //primaryStage.setHeight(screenBounds.getHeight());
 
         // Đặt Scene làm nội dung cho cửa sổ ứng dụng
         primaryStage.setScene(scene);
