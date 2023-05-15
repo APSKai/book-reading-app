@@ -1,16 +1,17 @@
 module com.example.app {
+    requires javafx.graphics;
     requires javafx.controls;
+    requires javafx.base;
     requires javafx.fxml;
-    requires javafx.web;
 
     requires org.controlsfx.controls;
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires tess4j;
-    requires pdfbox;
-    requires commons.csv;
+    requires org.apache.pdfbox;
     requires dropbox.core.sdk;
+    requires commons.csv;
 
     opens com.example.app1 to javafx.fxml;
     exports com.example.app1;

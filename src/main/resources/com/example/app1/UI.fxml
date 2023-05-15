@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
@@ -14,65 +15,97 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.web.WebView?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app1.Controller">
-   <top>
-      <ToolBar prefHeight="63.0" prefWidth="800.0" BorderPane.alignment="CENTER">
-        <items>
-          <Button fx:id="newButton" contentDisplay="TOP" mnemonicParsing="false" onMouseClicked="#chooseFile" onMouseEntered="#changeColorEnterNew" onMouseExited="#returnColorNew" prefHeight="45.0" prefWidth="45.0" style="-fx-background-color: gray;" text="New">
-               <graphic>
-                  <ImageView fitHeight="27.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../../../image/document_empty.png" />
-                     </image>
-                  </ImageView>
-               </graphic>
-            </Button>
-            <Button fx:id="prevButton" contentDisplay="TOP" disable="true" mnemonicParsing="false" onMouseClicked="#prevButtonClicked" onMouseEntered="#changeColorEnterPrev" onMouseExited="#returnColorPrev" style="-fx-background-color: gray;" text="Prev">
-               <graphic>
-                  <ImageView fitHeight="27.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../../../image/prev.png" />
-                     </image>
-                  </ImageView>
-               </graphic></Button>
-            <Button fx:id="nextButton" contentDisplay="TOP" disable="true" mnemonicParsing="false" onMouseClicked="#nextButtonClicked" onMouseEntered="#changeColorEnterNext" onMouseExited="#returnColorNext" style="-fx-background-color: gray;" text="Next">
-               <graphic>
-                  <ImageView fitHeight="27.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../../../image/next.png" />
-                     </image>
-                  </ImageView>
-               </graphic></Button>
-            <Button fx:id="filterButton" contentDisplay="TOP" mnemonicParsing="false" onMouseClicked="#openFilter" onMouseEntered="#changeColorEnterFilter" onMouseExited="#returnColorFilter" prefHeight="45.0" prefWidth="45.0" style="-fx-background-color: gray;" text="Filter">
-               <graphic>
-                  <ImageView fitHeight="27.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../../../image/filer.png" />
-                     </image>
-                  </ImageView>
-               </graphic></Button>
-            <ComboBox fx:id="comboBox" editable="true" onAction="#selectRatio" onMouseEntered="#handleComboBoxAction" prefWidth="150.0" visible="false" />
-            <TextField fx:id="pageNum" alignment="BOTTOM_RIGHT" onAction="#selectPage" prefHeight="26.0" prefWidth="44.0" text="1" visible="false" />
-            <Label fx:id="maxPageNum" prefHeight="26.0" prefWidth="44.0" />
-            <Button fx:id="closeButton" mnemonicParsing="false" onMouseClicked="#closePDF" text="Close" visible="false" />
-            <Button fx:id="translateButton" mnemonicParsing="false" onMouseClicked="#openTranslator" text="Translate" visible="false" />
-            <Button fx:id="bookMark" mnemonicParsing="false" onMouseClicked="#newBookMark" text="Mark" />
-        </items>
-      </ToolBar>
-   </top>
-   <left>
-      <VBox prefHeight="537.0" prefWidth="341.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
-         <children>
-            <Text fx:id="label" fill="#1e21ae" strokeType="OUTSIDE" strokeWidth="0.0" text="Recent Books" textAlignment="CENTER" wrappingWidth="342.9366149902344">
-               <font>
-                  <Font size="24.0" />
-               </font>
-            </Text>
-            <ListView fx:id="list" onMouseClicked="#getFile" prefHeight="503.0" prefWidth="343.0" />
-         </children>
-      </VBox>
-   </left>
-   <center>
-      <WebView fx:id="webView" onMouseDragged="#dragPos" onMousePressed="#getPos" onMouseReleased="#finalPos" prefHeight="493.0" prefWidth="441.0" BorderPane.alignment="CENTER" />
-   </center>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="669.0" prefWidth="1095.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.app1.Controller">
+    <top>
+        <ToolBar prefHeight="63.0" prefWidth="800.0" style="-fx-background-color: #3490CF;" BorderPane.alignment="CENTER">
+            <items>
+                <Button fx:id="newButton" contentDisplay="TOP" mnemonicParsing="false" onMouseClicked="#chooseFile" prefHeight="45.0" prefWidth="45.0" style="-fx-background-color: gray;" text="New">
+                    <graphic>
+                        <ImageView fitHeight="27.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../../../image/document_empty.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor>
+                </Button>
+                <Button fx:id="prevButton" contentDisplay="TOP" disable="true" mnemonicParsing="false" onMouseClicked="#prevButtonClicked" style="-fx-background-color: gray;" text="Prev">
+                    <graphic>
+                        <ImageView fitHeight="27.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../../../image/prev.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor></Button>
+                <Button fx:id="nextButton" contentDisplay="TOP" disable="true" mnemonicParsing="false" onMouseClicked="#nextButtonClicked" style="-fx-background-color: gray;" text="Next">
+                    <graphic>
+                        <ImageView fitHeight="27.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../../../image/next.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor></Button>
+                <Button fx:id="filterButton" contentDisplay="TOP" mnemonicParsing="false" onMouseClicked="#openFilter" prefHeight="45.0" prefWidth="45.0" style="-fx-background-color: gray;" text="Filter">
+                    <graphic>
+                        <ImageView fitHeight="27.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../../../image/filer.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor></Button>
+                <ComboBox fx:id="comboBox" editable="true" onAction="#selectRatio" onMouseEntered="#handleComboBoxAction" prefWidth="150.0" visible="false" />
+                <TextField fx:id="pageNum" alignment="BOTTOM_RIGHT" onAction="#selectPage" prefHeight="26.0" prefWidth="44.0" text="1" visible="false" />
+                <Label fx:id="maxPageNum" prefHeight="26.0" prefWidth="44.0" textFill="#f70b0b">
+                    <font>
+                        <Font name="System Bold" size="12.0" />
+                    </font></Label>
+                <Button fx:id="closeButton" mnemonicParsing="false" onMouseClicked="#closePDF" text="Close" visible="false">
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor></Button>
+                <Button fx:id="bookMark" mnemonicParsing="false" onMouseClicked="#newBookMark" visible="false">
+                    <graphic>
+                        <ImageView fitHeight="27.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../../../image/mark.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor></Button>
+                <ComboBox fx:id="language" onAction="#setLang" prefHeight="26.0" prefWidth="83.0" visible="false" />
+                <Button fx:id="translateButton" mnemonicParsing="false" onMouseClicked="#openTranslator" text="Translate" visible="false">
+                    <cursor>
+                        <Cursor fx:constant="HAND" />
+                    </cursor></Button>
+            </items>
+        </ToolBar>
+    </top>
+    <left>
+        <VBox prefHeight="537.0" prefWidth="341.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER">
+            <children>
+                <Text fx:id="label" fill="#1e21ae" strokeType="OUTSIDE" strokeWidth="0.0" text="Recent Books" textAlignment="CENTER" wrappingWidth="342.9366149902344">
+                    <font>
+                        <Font size="24.0" />
+                    </font>
+                </Text>
+                <ListView fx:id="list" onMouseClicked="#getFile" prefHeight="576.0" prefWidth="343.0" />
+            </children>
+        </VBox>
+    </left>
+    <center>
+        <WebView fx:id="webView" onMouseClicked="#releaseRect" onMouseDragged="#dragPos" onMousePressed="#getPos" onMouseReleased="#finalPos" prefHeight="493.0" prefWidth="441.0" BorderPane.alignment="CENTER" />
+    </center>
 </BorderPane>
